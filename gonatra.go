@@ -39,10 +39,10 @@ var (
 )
 
 func init() {
-    http.HandleFunc("/", Dispatcher)
+    http.HandleFunc("/", dispatcher)
 }
 
-func GetParams(route *Route, req *http.Request) map[string][]string {
+func getParams(route *Route, req *http.Request) map[string][]string {
     params      := make(map[string][]string)
     // Named params, specified in the route declaration
     pathMatches := pathRegexp.FindAllString(route.Path, -1)
@@ -62,17 +62,17 @@ func GetParams(route *Route, req *http.Request) map[string][]string {
     return params
 }
 
-func BuildRequest(httpReq *http.Request, route *Route) Request {
-    params := GetParams(route, httpReq)
+func buildRequest(httpReq *http.Request, route *Route) Request {
+    params := getParams(route, httpReq)
     return Request{httpReq, params}
 }
 
-func Dispatcher(res http.ResponseWriter, req *http.Request) {
+func dispatcher(res http.ResponseWriter, req *http.Request) {
     for _, route := range routes {
-        if (MatchRoute(&route, req.URL.Path)) {
+        if (matchRoute(&route, req.URL.Path)) {
             if (route.Verb == req.Method) {
                 req.ParseForm()
-                request := BuildRequest(req, &route)
+                request := buildRequest(req, &route)
                 route.Callback(res, &request)
                 return
             }
@@ -81,11 +81,11 @@ func Dispatcher(res http.ResponseWriter, req *http.Request) {
     http.NotFound(res, req)
 }
 
-func GenRouteRegexp(route string) *regexp.Regexp {
+func genRouteRegexp(route string) *regexp.Regexp {
     return regexp.MustCompile(paramRegexp.ReplaceAllString(route, ".+"))
 }
 
-func MatchRoute(route *Route, path string) bool {
+func matchRoute(route *Route, path string) bool {
     return route.Rgxp.MatchString(path)
 }
 
@@ -100,7 +100,7 @@ func ValidVerb(verb string) bool {
 
 func RegisterRoute(verb, path string, callback func(res http.ResponseWriter, req *Request)) bool {
     if ValidVerb(verb) {
-        rgxp  := GenRouteRegexp(path)
+        rgxp  := genRouteRegexp(path)
         route := Route{path, verb, callback, rgxp}
         routes = append(routes, route)
         return true

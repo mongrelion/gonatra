@@ -117,7 +117,7 @@ func TestSetSessionKey(t *testing.T) {
 }
 
 func TestGenRouteRegexp(t *testing.T) {
-    rgxp := GenRouteRegexp("/fruits/:id")
+    rgxp := genRouteRegexp("/fruits/:id")
     if (rgxp.String() != "/fruits/.+") {
         t.Errorf("expected regular expression body to equal \"/fruits/.+\" but got \"%s\"", rgxp.String())
     }
@@ -127,12 +127,12 @@ func TestMatchRoute(t *testing.T) {
     carsUrl    := "/cars/123"
     fruitsUrl  := "/fruits/123"
     route      := Route{"/cars/:id", HTTP_GET, nil, nil}
-    route.Rgxp = GenRouteRegexp(route.Path)
+    route.Rgxp = genRouteRegexp(route.Path)
 
-    if (!MatchRoute(&route, carsUrl)) {
+    if (!matchRoute(&route, carsUrl)) {
         t.Errorf("expected route %s to match %s", route.Path, carsUrl)
     }
-    if (MatchRoute(&route, fruitsUrl)) {
+    if (matchRoute(&route, fruitsUrl)) {
         t.Errorf("expected route %s not to match %s", route.Path, fruitsUrl)
     }
 }
