@@ -94,3 +94,19 @@ func TestRenderText(t *testing.T) {
     }
     */
 }
+
+func TestSetSessionKey(t *testing.T) {
+    key, value := "lolcat", "icanhazburger"
+    SetSessionKey(key, value)
+
+    // Test the variable is set in session var.
+    val, ok := session.m[key]
+    if (!ok) {
+        t.Errorf("expected key \"%s\" to be defined in session map.", key)
+    }
+
+    // Test the key value is properly set.
+    if (val != value) {
+        t.Errorf("expected key \"%s\" key to have value \"%s\" but got %s", key, value, val)
+    }
+}

@@ -3,6 +3,7 @@ package gonatra
 import (
     "net/http"
     "log"
+    "sync"
 )
 
 type Route struct {
@@ -21,8 +22,11 @@ const (
 var (
     validVerbs []string = []string{HTTP_GET, HTTP_POST, HTTP_PUT, HTTP_DELETE}
     routes     []Route  = make([]Route, 0, 0)
+    session             = struct{
+        sync.RWMutex
+        m map[string]string
+    }{m: make(map[string]string)}
 )
-
 func ValidVerb(verb string) bool {
     for _, validVerb := range validVerbs {
         if (verb == validVerb) {
@@ -63,4 +67,20 @@ func RenderText(res http.ResponseWriter, str string) (int, error) {
 
 func Start(port string) {
     log.Fatal(http.ListenAndServe(port, nil))
+}
+
+/* Retrieve a value from session */
+func GetSessionKey(k string) (val string) {
+    session.RLock()
+    val, _ = session.m[k]
+    session.RUnlock()
+    return
+}
+
+/* Set a value in session */
+func SetSessionKey(k, v string) string {
+    session.Lock()
+    session.m[k] = v
+    session.Unlock()
+    return v
 }
