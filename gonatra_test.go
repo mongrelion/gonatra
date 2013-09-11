@@ -172,3 +172,7 @@ func TestBuildRequest(t *testing.T) {
     // htt.Request pointer and a map of params.
     // Skipped until I figure out how to create a request and a response from the scratch.
 }
+
+func TestRenderJson(t *testing.T) {
+    // Skipped until I figure out how to create a request and a response from the scratch.
+}

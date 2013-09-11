@@ -117,8 +117,13 @@ func Post(path string, callback func(res http.ResponseWriter, req *Request)) boo
     return RegisterRoute(HTTP_POST, path, callback)
 }
 
-func RenderText(res http.ResponseWriter, str string) (int, error) {
-    return res.Write([]byte(str))
+func RenderText(res http.ResponseWriter, str string) {
+    res.Write([]byte(str))
+}
+
+func RenderJson(res http.ResponseWriter, str string) {
+    res.Header().Set("Content-Type", "application/json")
+    RenderText(res, str)
 }
 
 func Start(port string) {
