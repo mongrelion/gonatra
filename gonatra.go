@@ -43,7 +43,13 @@ func init() {
 }
 
 func getParams(route *Route, req *http.Request) map[string][]string {
-    params      := make(map[string][]string)
+    params := make(map[string][]string)
+    // Params from query string and form.
+    req.ParseForm()
+    for param, values := range req.Form {
+        params[param] = values
+    }
+
     // Named params, specified in the route declaration
     pathMatches := pathRegexp.FindAllString(route.Path, -1)
     urlMatches  := pathRegexp.FindAllString(req.URL.Path, -1)
@@ -54,11 +60,6 @@ func getParams(route *Route, req *http.Request) map[string][]string {
         }
     }
 
-    // Params from query string and form.
-    req.ParseForm()
-    for param, values := range req.Form {
-        params[param] = values
-    }
     return params
 }
 
