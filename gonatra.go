@@ -9,7 +9,7 @@ import (
 
 type Request struct {
     HttpRequest *http.Request
-    Params      map[string]string
+    Params      map[string][]string
 }
 
 type Route struct {
@@ -42,21 +42,28 @@ func init() {
     http.HandleFunc("/", Dispatcher)
 }
 
-func GetParams(route *Route, currentPath string) map[string]string {
-    params      := make(map[string]string)
+func GetParams(route *Route, req *http.Request) map[string][]string {
+    params      := make(map[string][]string)
+    // Named params, specified in the route declaration
     pathMatches := pathRegexp.FindAllString(route.Path, -1)
-    urlMatches  := pathRegexp.FindAllString(currentPath, -1)
+    urlMatches  := pathRegexp.FindAllString(req.URL.Path, -1)
     for i, paramName := range pathMatches {
         if (paramRegexp.MatchString(paramName)) {
             param         := paramNameRegexp.FindString(paramName)
-            params[param]  = urlMatches[i]
+            params[param]  = []string{urlMatches[i]}
         }
+    }
+
+    // Params from query string and form.
+    req.ParseForm()
+    for param, values := range req.Form {
+        params[param] = values
     }
     return params
 }
 
 func BuildRequest(httpReq *http.Request, route *Route) Request {
-    params := GetParams(route, httpReq.URL.Path)
+    params := GetParams(route, httpReq)
     return Request{httpReq, params}
 }
 
@@ -64,6 +71,7 @@ func Dispatcher(res http.ResponseWriter, req *http.Request) {
     for _, route := range routes {
         if (MatchRoute(&route, req.URL.Path)) {
             if (route.Verb == req.Method) {
+                req.ParseForm()
                 request := BuildRequest(req, &route)
                 route.Callback(res, &request)
                 return
