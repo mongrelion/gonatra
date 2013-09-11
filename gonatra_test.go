@@ -136,3 +136,7 @@ func TestMatchRoute(t *testing.T) {
         t.Errorf("expected route %s not to match %s", route.Path, fruitsUrl)
     }
 }
+
+func TestDispatcher(t *testing.T) {
+    // Skipped until I figure out how to create a new request and response from the scratch.
+}

@@ -32,6 +32,22 @@ var (
     }{m: make(map[string]string)}
 )
 
+func init() {
+    http.HandleFunc("/", Dispatcher)
+}
+
+func Dispatcher(res http.ResponseWriter, req *http.Request) {
+    for _, route := range routes {
+        if (MatchRoute(&route, req.URL.Path)) {
+            if (route.Verb == req.Method) {
+                route.Callback(res, req)
+                return
+            }
+        }
+    }
+    http.NotFound(res, req)
+}
+
 func GenRouteRegexp(route string) *regexp.Regexp {
     return regexp.MustCompile(paramRegexp.ReplaceAllString(route, ".+"))
 }
@@ -54,13 +70,6 @@ func RegisterRoute(verb, path string, callback func(res http.ResponseWriter, req
         rgxp  := GenRouteRegexp(path)
         route := Route{path, verb, callback, rgxp}
         routes = append(routes, route)
-        http.HandleFunc(route.Path, func(response http.ResponseWriter, request *http.Request) {
-            if (route.Verb == request.Method) {
-                route.Callback(response, request)
-            } else {
-                http.NotFound(response, request)
-            }
-        })
         return true
     } else {
         return false
