@@ -23,7 +23,7 @@ func TestValidVerb(t *testing.T) {
 }
 
 func TestRegisterRoute(t *testing.T) {
-    route  := Route{"/testregisterroute", HTTP_GET, func(http.ResponseWriter, *http.Request) {}}
+    route  := Route{"/testregisterroute", HTTP_GET, func(http.ResponseWriter, *http.Request) {}, nil}
     result := RegisterRoute(HTTP_GET, route.Path, route.Callback)
 
     // Test that it returns true given a valid path, verb and callback.
@@ -38,6 +38,11 @@ func TestRegisterRoute(t *testing.T) {
     }
     if (lastRoute.Verb != route.Verb) {
         t.Errorf("expected route verb to be %s but got %s", route.Verb, lastRoute.Verb)
+    }
+
+    // Test it generates the regexp for the route
+    if (lastRoute.Rgxp == nil) {
+        t.Errorf("expected route regular expression to be generated but got nil")
     }
 }
 
@@ -108,5 +113,26 @@ func TestSetSessionKey(t *testing.T) {
     // Test the key value is properly set.
     if (val != value) {
         t.Errorf("expected key \"%s\" key to have value \"%s\" but got %s", key, value, val)
+    }
+}
+
+func TestGenRouteRegexp(t *testing.T) {
+    rgxp := GenRouteRegexp("/fruits/:id")
+    if (rgxp.String() != "/fruits/.+") {
+        t.Errorf("expected regular expression body to equal \"/fruits/.+\" but got \"%s\"", rgxp.String())
+    }
+}
+
+func TestMatchRoute(t *testing.T) {
+    carsUrl    := "/cars/123"
+    fruitsUrl  := "/fruits/123"
+    route      := Route{"/cars/:id", HTTP_GET, nil, nil}
+    route.Rgxp = GenRouteRegexp(route.Path)
+
+    if (!MatchRoute(&route, carsUrl)) {
+        t.Errorf("expected route %s to match %s", route.Path, carsUrl)
+    }
+    if (MatchRoute(&route, fruitsUrl)) {
+        t.Errorf("expected route %s not to match %s", route.Path, fruitsUrl)
     }
 }

@@ -3,13 +3,15 @@ package gonatra
 import (
     "net/http"
     "log"
+    "regexp"
     "sync"
 )
 
 type Route struct {
-    Path string
-    Verb string
+    Path     string
+    Verb     string
     Callback func(response http.ResponseWriter, request *http.Request)
+    Rgxp     *regexp.Regexp
 }
 
 const (
@@ -20,6 +22,8 @@ const (
 )
 
 var (
+    paramRegexp         = regexp.MustCompile(":[a-zA-Z0-9_]+")
+    pathRegexp          = regexp.MustCompile(":?[a-zA-Z0-9_]+")
     validVerbs []string = []string{HTTP_GET, HTTP_POST, HTTP_PUT, HTTP_DELETE}
     routes     []Route  = make([]Route, 0, 0)
     session             = struct{
@@ -27,6 +31,15 @@ var (
         m map[string]string
     }{m: make(map[string]string)}
 )
+
+func GenRouteRegexp(route string) *regexp.Regexp {
+    return regexp.MustCompile(paramRegexp.ReplaceAllString(route, ".+"))
+}
+
+func MatchRoute(route *Route, path string) bool {
+    return route.Rgxp.MatchString(path)
+}
+
 func ValidVerb(verb string) bool {
     for _, validVerb := range validVerbs {
         if (verb == validVerb) {
@@ -38,7 +51,8 @@ func ValidVerb(verb string) bool {
 
 func RegisterRoute(verb, path string, callback func(res http.ResponseWriter, req *http.Request)) bool {
     if ValidVerb(verb) {
-        route := Route{path, verb, callback}
+        rgxp  := GenRouteRegexp(path)
+        route := Route{path, verb, callback, rgxp}
         routes = append(routes, route)
         http.HandleFunc(route.Path, func(response http.ResponseWriter, request *http.Request) {
             if (route.Verb == request.Method) {
