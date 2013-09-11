@@ -90,18 +90,17 @@ func matchRoute(route *Route, path string) bool {
     return route.Rgxp.MatchString(path)
 }
 
-// TODO: Make it private
-func ValidVerb(verb string) bool {
-    for _, validVerb := range validVerbs {
-        if verb == validVerb {
+func validVerb(verb string) bool {
+    for _, vVerb := range validVerbs {
+        if verb == vVerb {
             return true
         }
     }
     return false
 }
 
-func RegisterRoute(verb, path string, callback func(res http.ResponseWriter, req *Request)) bool {
-    if ValidVerb(verb) {
+func registerRoute(verb, path string, callback func(res http.ResponseWriter, req *Request)) bool {
+    if validVerb(verb) {
         rgxp  := genRouteRegexp(path)
         route := Route{path, verb, callback, rgxp}
         routes = append(routes, route)
@@ -112,11 +111,11 @@ func RegisterRoute(verb, path string, callback func(res http.ResponseWriter, req
 }
 
 func Get(path string, callback func(res http.ResponseWriter, req *Request)) bool {
-    return RegisterRoute(HTTP_GET, path, callback)
+    return registerRoute(HTTP_GET, path, callback)
 }
 
 func Post(path string, callback func(res http.ResponseWriter, req *Request)) bool {
-    return RegisterRoute(HTTP_POST, path, callback)
+    return registerRoute(HTTP_POST, path, callback)
 }
 
 func RenderText(res http.ResponseWriter, str string) {

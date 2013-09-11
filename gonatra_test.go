@@ -10,13 +10,13 @@ func TestValidVerb(t *testing.T) {
     invalidVerbs := []string{"W00T", "PATCH", "INVALID", "JOE"}
 
     for _, verb := range validVerbs {
-        if !ValidVerb(verb) {
+        if !validVerb(verb) {
             t.Errorf("expected %d verb to be valid but was invalid.")
         }
     }
 
     for _, verb := range invalidVerbs {
-        if ValidVerb(verb) {
+        if validVerb(verb) {
             t.Errorf("expected %d verb to be invalid but was valid.")
         }
     }
@@ -24,7 +24,7 @@ func TestValidVerb(t *testing.T) {
 
 func TestRegisterRoute(t *testing.T) {
     route  := Route{"/testregisterroute", HTTP_GET, func(http.ResponseWriter, *Request) {}, nil}
-    result := RegisterRoute(HTTP_GET, route.Path, route.Callback)
+    result := registerRoute(HTTP_GET, route.Path, route.Callback)
 
     // Test that it returns true given a valid path, verb and callback.
     if !result {
