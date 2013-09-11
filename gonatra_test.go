@@ -10,13 +10,13 @@ func TestValidVerb(t *testing.T) {
     invalidVerbs := []string{"W00T", "PATCH", "INVALID", "JOE"}
 
     for _, verb := range validVerbs {
-        if (!ValidVerb(verb)) {
+        if !ValidVerb(verb) {
             t.Errorf("expected %d verb to be valid but was invalid.")
         }
     }
 
     for _, verb := range invalidVerbs {
-        if (ValidVerb(verb)) {
+        if ValidVerb(verb) {
             t.Errorf("expected %d verb to be invalid but was valid.")
         }
     }
@@ -27,21 +27,21 @@ func TestRegisterRoute(t *testing.T) {
     result := RegisterRoute(HTTP_GET, route.Path, route.Callback)
 
     // Test that it returns true given a valid path, verb and callback.
-    if (!result) {
+    if !result {
         t.Errorf("expected RegisterRoute() to return %t but got %t", !result, result)
     }
 
     // Test that the registered route matches everything
     lastRoute := routes[len(routes) -1]
-    if (lastRoute.Path != route.Path) {
+    if lastRoute.Path != route.Path {
         t.Errorf("expected route path to be %s but got %s", route.Path, lastRoute.Path)
     }
-    if (lastRoute.Verb != route.Verb) {
+    if lastRoute.Verb != route.Verb {
         t.Errorf("expected route verb to be %s but got %s", route.Verb, lastRoute.Verb)
     }
 
     // Test it generates the regexp for the route
-    if (lastRoute.Rgxp == nil) {
+    if lastRoute.Rgxp == nil {
         t.Errorf("expected route regular expression to be generated but got nil")
     }
 }
@@ -52,17 +52,17 @@ func TestGet(t *testing.T) {
     lastRoute := routes[len(routes) -1]
 
     // Test that the Get method returns true
-    if (!result) {
+    if !result {
         t.Errorf("expected Get() to return %t but got %t", !result, result)
     }
 
     // Test that the given path was set properly
-    if (lastRoute.Path != path) {
+    if lastRoute.Path != path {
         t.Errorf("expected path '%s' but got '%s'", path, lastRoute.Path)
     }
 
     // Test that the registered verb for the route is GET.
-    if (lastRoute.Verb != HTTP_GET) {
+    if lastRoute.Verb != HTTP_GET {
         t.Errorf("expected HTTP verb to be %s but got %s", HTTP_GET, lastRoute.Verb)
     }
 }
@@ -73,17 +73,17 @@ func TestPost(t *testing.T) {
     lastRoute := routes[len(routes) -1]
 
     // Test that the Post method returns true
-    if (!result) {
+    if !result {
         t.Errorf("expected Post() to return %t but got %t", !result, result)
     }
 
     // Test that the given path was set properly
-    if (lastRoute.Path != path) {
+    if lastRoute.Path != path {
         t.Errorf("expected path '%s' but got '%s'", path, lastRoute.Path)
     }
 
     // Test that the registered verb for the route is GET.
-    if (lastRoute.Verb != HTTP_POST) {
+    if lastRoute.Verb != HTTP_POST {
         t.Errorf("expected HTTP verb to be %s but got %s", HTTP_POST, lastRoute.Verb)
     }
 }
@@ -94,7 +94,7 @@ func TestRenderText(t *testing.T) {
     sLen      := len(str)
     response  := new(http.ResponseWriter)
     bLen, err := RenderText(response, "test")
-    if (bLen != sLen) {
+    if bLen != sLen {
         t.Errorf("%d bytes expected to be written by Render but got %d", sLen, bLen)
     }
     */
@@ -106,19 +106,19 @@ func TestSetSessionKey(t *testing.T) {
 
     // Test the variable is set in session var.
     val, ok := session.m[key]
-    if (!ok) {
+    if !ok {
         t.Errorf("expected key \"%s\" to be defined in session map.", key)
     }
 
     // Test the key value is properly set.
-    if (val != value) {
+    if val != value {
         t.Errorf("expected key \"%s\" key to have value \"%s\" but got %s", key, value, val)
     }
 }
 
 func TestGenRouteRegexp(t *testing.T) {
     rgxp := genRouteRegexp("/fruits/:id")
-    if (rgxp.String() != "/fruits/.+") {
+    if rgxp.String() != "/fruits/.+" {
         t.Errorf("expected regular expression body to equal \"/fruits/.+\" but got \"%s\"", rgxp.String())
     }
 }
@@ -129,10 +129,10 @@ func TestMatchRoute(t *testing.T) {
     route      := Route{"/cars/:id", HTTP_GET, nil, nil}
     route.Rgxp = genRouteRegexp(route.Path)
 
-    if (!matchRoute(&route, carsUrl)) {
+    if !matchRoute(&route, carsUrl) {
         t.Errorf("expected route %s to match %s", route.Path, carsUrl)
     }
-    if (matchRoute(&route, fruitsUrl)) {
+    if matchRoute(&route, fruitsUrl) {
         t.Errorf("expected route %s not to match %s", route.Path, fruitsUrl)
     }
 }
@@ -155,11 +155,11 @@ func TestGetParams(t *testing.T) {
     for key, expectedValue := range expectedParams {
         val, keyIsPresent := params[key]
         // Test that the key is present.
-        if (!keyIsPresent) {
+        if !keyIsPresent {
             t.Errorf("expected key %s to be present in params map.", key)
         } else {
             // Test that the key holds the proper value.
-            if (expectedValue != val) {
+            if expectedValue != val {
                 t.Errorf("expected key %s to have value %s but got %s", key, expectedValue, val)
             }
         }

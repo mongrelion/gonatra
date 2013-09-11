@@ -54,7 +54,7 @@ func getParams(route *Route, req *http.Request) map[string][]string {
     pathMatches := pathRegexp.FindAllString(route.Path, -1)
     urlMatches  := pathRegexp.FindAllString(req.URL.Path, -1)
     for i, paramName := range pathMatches {
-        if (paramRegexp.MatchString(paramName)) {
+        if paramRegexp.MatchString(paramName) {
             param         := paramNameRegexp.FindString(paramName)
             params[param]  = []string{urlMatches[i]}
         }
@@ -70,8 +70,8 @@ func buildRequest(httpReq *http.Request, route *Route) Request {
 
 func dispatcher(res http.ResponseWriter, req *http.Request) {
     for _, route := range routes {
-        if (matchRoute(&route, req.URL.Path)) {
-            if (route.Verb == req.Method) {
+        if matchRoute(&route, req.URL.Path) {
+            if route.Verb == req.Method {
                 req.ParseForm()
                 request := buildRequest(req, &route)
                 route.Callback(res, &request)
@@ -90,9 +90,10 @@ func matchRoute(route *Route, path string) bool {
     return route.Rgxp.MatchString(path)
 }
 
+// TODO: Make it private
 func ValidVerb(verb string) bool {
     for _, validVerb := range validVerbs {
-        if (verb == validVerb) {
+        if verb == validVerb {
             return true
         }
     }
