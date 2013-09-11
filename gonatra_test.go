@@ -23,7 +23,7 @@ func TestValidVerb(t *testing.T) {
 }
 
 func TestRegisterRoute(t *testing.T) {
-    route  := Route{"/testregisterroute", HTTP_GET, func(http.ResponseWriter, *http.Request) {}, nil}
+    route  := Route{"/testregisterroute", HTTP_GET, func(http.ResponseWriter, *Request) {}, nil}
     result := RegisterRoute(HTTP_GET, route.Path, route.Callback)
 
     // Test that it returns true given a valid path, verb and callback.
@@ -48,7 +48,7 @@ func TestRegisterRoute(t *testing.T) {
 
 func TestGet(t *testing.T) {
     path      := "/testget"
-    result    := Get(path, func(http.ResponseWriter, *http.Request) {})
+    result    := Get(path, func(http.ResponseWriter, *Request) {})
     lastRoute := routes[len(routes) -1]
 
     // Test that the Get method returns true
@@ -69,7 +69,7 @@ func TestGet(t *testing.T) {
 
 func TestPost(t *testing.T) {
     path      := "/testpost"
-    result    := Post(path, func(http.ResponseWriter, *http.Request) {})
+    result    := Post(path, func(http.ResponseWriter, *Request) {})
     lastRoute := routes[len(routes) -1]
 
     // Test that the Post method returns true
@@ -139,4 +139,34 @@ func TestMatchRoute(t *testing.T) {
 
 func TestDispatcher(t *testing.T) {
     // Skipped until I figure out how to create a new request and response from the scratch.
+}
+
+func TestGetParams(t *testing.T) {
+    path           := "/users/:id/articles/:article_id/comments/:comment_id"
+    url            := "/users/123/articles/456/comments/789"
+    route          := Route{path, HTTP_GET, nil, nil}
+    params         := GetParams(&route, url)
+    expectedParams := map[string]string{
+        "id": "123",
+        "article_id": "456",
+        "comment_id": "789",
+    }
+    for key, expectedValue := range expectedParams {
+        val, keyIsPresent := params[key]
+        // Test that the key is present.
+        if (!keyIsPresent) {
+            t.Errorf("expected key %s to be present in params map.", key)
+        } else {
+            // Test that the key holds the proper value.
+            if (expectedValue != val) {
+                t.Errorf("expected key %s to have value %s but got %s", key, expectedValue, val)
+            }
+        }
+    }
+}
+
+func TestBuildRequest(t *testing.T) {
+    // Test that it returns a gonatra.Reques object holding a
+    // htt.Request pointer and a map of params.
+    // Skipped until I figure out how to create a request and a response from the scratch.
 }
