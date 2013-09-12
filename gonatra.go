@@ -1,10 +1,20 @@
 package gonatra
 
 import (
+    "fmt"
     "net/http"
     "log"
     "regexp"
     "sync"
+)
+
+const (
+    HTTP_GET                = "GET"
+    HTTP_POST               = "POST"
+    HTTP_PUT                = "PUT"
+    HTTP_DELETE             = "DELETE"
+    CONTENT_TYPE_JSON       = "application/json"
+    CONTENT_TYPE_PLAIN_TEXT = "text/plain"
 )
 
 type Request struct {
@@ -19,12 +29,6 @@ type Route struct {
     Rgxp     *regexp.Regexp
 }
 
-const (
-    HTTP_GET    = "GET"
-    HTTP_POST   = "POST"
-    HTTP_PUT    = "PUT"
-    HTTP_DELETE = "DELETE"
-)
 
 var (
     paramRegexp     = regexp.MustCompile(":[a-zA-Z0-9_]+")
@@ -123,15 +127,23 @@ func Post(path string, callback func(res http.ResponseWriter, req *Request)) boo
 }
 
 func RenderText(response http.ResponseWriter, str string) {
-    setHeader(response, "Content-Type", "text/plain") // TODO: bring the "text/plain" from somewhere else.
-    response.Write([]byte(str)) // TODO: use fmt.fmt.Fprint which receives a io.Writer instead of converting the string into an array of bytes.
+    setHeader(response, "Content-Type", CONTENT_TYPE_PLAIN_TEXT)
+    fmt.Fprint(response, str)
 }
 
-// TODO: Instead of receiving a string, receive a interface{} and call
-//       json.Marshal() on it.
+/*\
+|*| From http://golang.org/doc/articles/json_and_go.html
+|*| "The json package only accesses the exported fields of struct types
+|*| (those that begin with an uppercase letter). Therefore only the exported
+|*| fields of a struct will be present in the JSON output."
+|*| Using Go structs, your JSON output should look something like this:
+|*| {"Id":123,"Name":"John Doe","Email":"john@doe.com"}
+|*| So, instead of receiving a struct and calling json.Marshal() on it, it's up
+|*| to you to send your already built JSON object as a string to this method.
+\*/
 func RenderJSON(response http.ResponseWriter, str string) {
-    response.Header().Set("Content-Type", "application/json")
-    response.Write([]byte(str)) // TODO: use fmt.fmt.Fprint which receives a io.Writer instead of converting the string into an array of bytes.
+    response.Header().Set("Content-Type", CONTENT_TYPE_JSON)
+    fmt.Fprint(response, str)
 }
 
 func Start(port string) {
