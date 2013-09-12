@@ -2,6 +2,7 @@ package gonatra
 
 import(
     "net/http"
+    "net/http/httptest"
     "testing"
 )
 
@@ -89,15 +90,14 @@ func TestPost(t *testing.T) {
 }
 
 func TestRenderText(t *testing.T) {
-    /* Skipped until I figure out how to create a new ResponseWrite from the scratch.
-    str       := "test"
-    sLen      := len(str)
-    response  := new(http.ResponseWriter)
-    bLen, err := RenderText(response, "test")
-    if bLen != sLen {
-        t.Errorf("%d bytes expected to be written by Render but got %d", sLen, bLen)
+    text     := "Go, gonatra!"
+    response := httptest.NewRecorder()
+    RenderText(response, text)
+
+    // Test that the response body matches the sent string.
+    if response.Body.String() != text {
+        t.Errorf("expected response body to be %s but got %s", text, response.Body.String())
     }
-    */
 }
 
 func TestSetSessionKey(t *testing.T) {
