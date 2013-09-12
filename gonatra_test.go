@@ -235,15 +235,20 @@ func TestDispatcher(t *testing.T) {
 }
 
 func TestGetParams(t *testing.T) {
-    /* Skipped until I figure out how to create a request and a response from the scratch.
+    url            := "http://example.com/users/123/articles/456/comments/789?foo=bar&lolz=katz"
+    request, err   := http.NewRequest(HTTP_GET, url, nil)
+    if err != nil {
+        t.Errorf("Something went wrong while creating fake request to %s", url)
+    }
     path           := "/users/:id/articles/:article_id/comments/:comment_id"
-    url            := "/users/123/articles/456/comments/789"
     route          := Route{path, HTTP_GET, nil, nil}
-    params         := GetParams(&route, url)
+    params         := getParams(&route, request)
     expectedParams := map[string]string{
-        "id": "123",
+        "id":         "123",
         "article_id": "456",
         "comment_id": "789",
+        "foo":        "bar",
+        "lolz":       "katz",
     }
     for key, expectedValue := range expectedParams {
         val, keyIsPresent := params[key]
@@ -252,12 +257,11 @@ func TestGetParams(t *testing.T) {
             t.Errorf("expected key %s to be present in params map.", key)
         } else {
             // Test that the key holds the proper value.
-            if expectedValue != val {
+            if expectedValue != val[0] {
                 t.Errorf("expected key %s to have value %s but got %s", key, expectedValue, val)
             }
         }
     }
-    */
 }
 
 func TestBuildRequest(t *testing.T) {

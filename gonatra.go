@@ -50,17 +50,17 @@ func setHeader(response http.ResponseWriter, key, value string) {
     response.Header().Set(key, value)
 }
 
-func getParams(route *Route, req *http.Request) map[string][]string {
+func getParams(route *Route, request *http.Request) map[string][]string {
     params := make(map[string][]string)
     // Params from query string and form.
-    req.ParseForm()
-    for param, values := range req.Form {
+    request.ParseForm()
+    for param, values := range request.Form {
         params[param] = values
     }
 
     // Named params, specified in the route declaration
     pathMatches := pathRegexp.FindAllString(route.Path, -1)
-    urlMatches  := pathRegexp.FindAllString(req.URL.Path, -1)
+    urlMatches  := pathRegexp.FindAllString(request.URL.Path, -1)
     for i, paramName := range pathMatches {
         if paramRegexp.MatchString(paramName) {
             param         := paramNameRegexp.FindString(paramName)
