@@ -7,7 +7,6 @@ import(
 )
 
 func TestValidVerb(t *testing.T) {
-    validVerbs   := []string{"GET", "POST", "PUT", "DELETE"}
     invalidVerbs := []string{"W00T", "PATCH", "INVALID", "JOE"}
 
     for _, verb := range validVerbs {
@@ -265,9 +264,32 @@ func TestGetParams(t *testing.T) {
 }
 
 func TestBuildRequest(t *testing.T) {
-    // Test that it returns a gonatra.Reques object holding a
-    // htt.Request pointer and a map of params.
-    // Skipped until I figure out how to create a request and a response from the scratch.
+    route        := Route{"/foo/:id/bar/:bar_id", HTTP_GET, nil, nil}
+    url          := "http://example.com/foo/123/bar/456"
+    request, err := http.NewRequest(HTTP_GET, url, nil)
+    if err != nil {
+        t.Errorf("Something went wrong while creating fake request to %s", url)
+    }
+    gonatraRequest := buildRequest(request, &route)
+    // Test it has set HttpRequest
+    if gonatraRequest.HttpRequest == nil {
+        t.Errorf("expected HttpRequest to be set but got nil")
+    }
+
+    // Test it has set Params.
+    if gonatraRequest.Params == nil {
+        t.Errorf("expected Params to be set but got nil")
+    }  else {
+        // Test it sets the params properly.
+        fooParam := gonatraRequest.Params["id"][0]
+        barParam := gonatraRequest.Params["bar_id"][0]
+        if fooParam != "123" {
+            t.Errorf(`expected param "id" to be "123" but got %s`, fooParam)
+        }
+        if barParam != "456" {
+            t.Errorf(`expected param "bar_id" to be "456" but got %s`, barParam)
+        }
+    }
 }
 
 func TestSetHeader(t *testing.T) {

@@ -149,7 +149,7 @@ func Start(port string) {
     log.Fatal(http.ListenAndServe(port, nil))
 }
 
-/* Retrieve a value from session */
+// Retrieve a value from session
 func GetSessionKey(k string) (val string) {
     session.RLock()
     val, _ = session.m[k]
@@ -157,7 +157,7 @@ func GetSessionKey(k string) (val string) {
     return
 }
 
-/* Set a value in session */
+// Set a value in session
 func SetSessionKey(k, v string) string {
     session.Lock()
     session.m[k] = v
