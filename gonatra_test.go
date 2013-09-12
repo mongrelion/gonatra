@@ -98,6 +98,29 @@ func TestRenderText(t *testing.T) {
     if response.Body.String() != text {
         t.Errorf("expected response body to be %s but got %s", text, response.Body.String())
     }
+
+    // Test that the header is properly set.
+    contentType := response.Header().Get("Content-Type")
+    if contentType != "text/plain" {
+        t.Errorf("expected Content-Type to be \"text/plain\" but got %s", contentType)
+    }
+}
+
+func TestRenderJson(t *testing.T) {
+    obj := "{\"name\":\"apple\",\"color\":\"red\"}"
+    response := httptest.NewRecorder()
+    RenderJSON(response, obj)
+    responseBody := response.Body.String()
+    // Test that the response body is a JSON representation of the object.
+    if responseBody != obj {
+        t.Errorf("expected response body to be %s but got %s", obj, responseBody)
+    }
+
+    // Test that the header is properly set.
+    contentType := response.Header().Get("Content-Type")
+    if contentType != "application/json" {
+        t.Errorf("expected Content-Type to be \"application/json\" but got %s", contentType)
+    }
 }
 
 func TestSetSessionKey(t *testing.T) {
@@ -173,6 +196,12 @@ func TestBuildRequest(t *testing.T) {
     // Skipped until I figure out how to create a request and a response from the scratch.
 }
 
-func TestRenderJson(t *testing.T) {
-    // Skipped until I figure out how to create a request and a response from the scratch.
+func TestSetHeader(t *testing.T) {
+    response := httptest.NewRecorder()
+    expectedContentType := "text/plain"
+    setHeader(response, "Content-Type", expectedContentType)
+    contentType := response.Header().Get("Content-Type")
+    if contentType != expectedContentType {
+        t.Errorf("expected Content-Type header to be %s but got %s", expectedContentType, contentType)
+    }
 }

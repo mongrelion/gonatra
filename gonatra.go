@@ -42,6 +42,10 @@ func init() {
     http.HandleFunc("/", dispatcher)
 }
 
+func setHeader(response http.ResponseWriter, key, value string) {
+    response.Header().Set(key, value)
+}
+
 func getParams(route *Route, req *http.Request) map[string][]string {
     params := make(map[string][]string)
     // Params from query string and form.
@@ -118,13 +122,16 @@ func Post(path string, callback func(res http.ResponseWriter, req *Request)) boo
     return registerRoute(HTTP_POST, path, callback)
 }
 
-func RenderText(res http.ResponseWriter, str string) {
-    res.Write([]byte(str))
+func RenderText(response http.ResponseWriter, str string) {
+    setHeader(response, "Content-Type", "text/plain") // TODO: bring the "text/plain" from somewhere else.
+    response.Write([]byte(str)) // TODO: use fmt.fmt.Fprint which receives a io.Writer instead of converting the string into an array of bytes.
 }
 
-func RenderJson(res http.ResponseWriter, str string) {
-    res.Header().Set("Content-Type", "application/json")
-    RenderText(res, str)
+// TODO: Instead of receiving a string, receive a interface{} and call
+//       json.Marshal() on it.
+func RenderJSON(response http.ResponseWriter, str string) {
+    response.Header().Set("Content-Type", "application/json")
+    response.Write([]byte(str)) // TODO: use fmt.fmt.Fprint which receives a io.Writer instead of converting the string into an array of bytes.
 }
 
 func Start(port string) {
