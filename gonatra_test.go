@@ -161,7 +161,77 @@ func TestMatchRoute(t *testing.T) {
 }
 
 func TestDispatcher(t *testing.T) {
-    // Skipped until I figure out how to create a new request and response from the scratch.
+    albumsShowed, songCreated := false, false
+    // Register some verbs:
+    Get("/albums/:id", func(http.ResponseWriter, *Request) {
+        albumsShowed = true
+    })
+    Post("/albums/:id/songs", func(http.ResponseWriter, *Request) {
+        songCreated = true
+    })
+
+    url           := "http://example.com/foo"
+    response      := httptest.NewRecorder()
+    request, err  := http.NewRequest(HTTP_GET, url, nil)
+    if err != nil {
+        t.Errorf("Something went wrong while creating fake request to %s", url)
+        return
+    }
+    // Test it returns NotFound for no matching route.
+    dispatcher(response, request)
+    if response.Code != 404 {
+        t.Errorf("expected status code to be 404 but got %d", response.Code)
+    }
+
+    url           = "http://example.com/albums/123"
+    response      = httptest.NewRecorder()
+    request, err  = http.NewRequest(HTTP_POST, url, nil) // The route is actually registered for GET verb.
+    if err != nil {
+        t.Errorf("Something went wrong while creating fake request to %s", url)
+        return
+    }
+
+    // Test route found but verb doesn't match.
+    dispatcher(response, request)
+    if response.Code != 404 {
+        t.Errorf("expected status code to be 404 but got %d", response.Code)
+    }
+
+    // Test it calls the callback for the matched route.
+    url           = "http://example.com/albums/123"
+    response      = httptest.NewRecorder()
+    request, err  = http.NewRequest(HTTP_GET, url, nil)
+    if err != nil {
+        t.Errorf("Something went wrong while creating fake request to %s", url)
+        return
+    }
+
+    // Test route found but verb doesn't match.
+    dispatcher(response, request)
+    if response.Code != 200 {
+        t.Errorf("expected status code to be 200 but got %d", response.Code)
+    }
+    if !albumsShowed {
+        t.Errorf("callback for /albums/:id was never called")
+    }
+
+    // Test it calls the callback for the matched route.
+    url           = "http://example.com/albums/123/songs"
+    response      = httptest.NewRecorder()
+    request, err  = http.NewRequest(HTTP_POST, url, nil)
+    if err != nil {
+        t.Errorf("Something went wrong while creating fake request to %s", url)
+        return
+    }
+
+    // Test route found but verb doesn't match.
+    dispatcher(response, request)
+    if response.Code != 200 {
+        t.Errorf("expected status code to be 200 but got %d", response.Code)
+    }
+    if !songCreated {
+        t.Errorf("callback for /albums/:id/songs was never called")
+    }
 }
 
 func TestGetParams(t *testing.T) {

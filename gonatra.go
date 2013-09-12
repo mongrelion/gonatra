@@ -76,18 +76,18 @@ func buildRequest(httpReq *http.Request, route *Route) Request {
     return Request{httpReq, params}
 }
 
-func dispatcher(res http.ResponseWriter, req *http.Request) {
+func dispatcher(response http.ResponseWriter, request *http.Request) {
     for _, route := range routes {
-        if matchRoute(&route, req.URL.Path) {
-            if route.Verb == req.Method {
-                req.ParseForm()
-                request := buildRequest(req, &route)
-                route.Callback(res, &request)
+        if matchRoute(&route, request.URL.Path) {
+            if route.Verb == request.Method {
+                request.ParseForm()
+                gonatraRequest := buildRequest(request, &route)
+                route.Callback(response, &gonatraRequest)
                 return
             }
         }
     }
-    http.NotFound(res, req)
+    http.NotFound(response, request)
 }
 
 func genRouteRegexp(route string) *regexp.Regexp {
@@ -131,16 +131,15 @@ func RenderText(response http.ResponseWriter, str string) {
     fmt.Fprint(response, str)
 }
 
-/*\
-|*| From http://golang.org/doc/articles/json_and_go.html
-|*| "The json package only accesses the exported fields of struct types
-|*| (those that begin with an uppercase letter). Therefore only the exported
-|*| fields of a struct will be present in the JSON output."
-|*| Using Go structs, your JSON output should look something like this:
-|*| {"Id":123,"Name":"John Doe","Email":"john@doe.com"}
-|*| So, instead of receiving a struct and calling json.Marshal() on it, it's up
-|*| to you to send your already built JSON object as a string to this method.
-\*/
+// From http://golang.org/doc/articles/json_and_go.html:
+// "The json package only accesses the exported fields of struct types
+// (those that begin with an uppercase letter). Therefore only the exported
+// fields of a struct will be present in the JSON output."
+// Using Go structs, your JSON output should look something like this:
+// {"Id":123,"Name":"John Doe","Email":"john@doe.com"}
+// (notice the key names starting with an uppercase letter).
+// So, instead of receiving a struct and calling json.Marshal() on it, it's up
+// to you to send your already built JSON object as a string to this method.
 func RenderJSON(response http.ResponseWriter, str string) {
     response.Header().Set("Content-Type", CONTENT_TYPE_JSON)
     fmt.Fprint(response, str)
