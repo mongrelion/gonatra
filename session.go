@@ -1,17 +1,26 @@
 package gonatra
 
+import (
+    "sync"
+)
+
+type session struct {
+    sync.RWMutex
+    m map[string]string
+}
+
 // Retrieve a value from session
-func GetSessionKey(k string) (val string) {
-    session.RLock()
-    val, _ = session.m[k]
-    session.RUnlock()
+func (s *session) Get(k string) (val string) {
+    s.RLock()
+    val, _ = s.m[k]
+    s.RUnlock()
     return
 }
 
 // Set a value in session
-func SetSessionKey(k, v string) string {
-    session.Lock()
-    session.m[k] = v
-    session.Unlock()
+func (s *session) Set(k, v string) string {
+    s.Lock()
+    s.m[k] = v
+    s.Unlock()
     return v
 }

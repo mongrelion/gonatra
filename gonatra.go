@@ -4,7 +4,7 @@ import (
     "net/http"
     "log"
     "regexp"
-    "sync"
+    //"sync"
 )
 
 const (
@@ -22,10 +22,7 @@ var (
     paramNameRegexp = regexp.MustCompile("[a-zA-Z0-9_]+")
     validVerbs      = []string{HTTP_GET, HTTP_POST, HTTP_PUT, HTTP_DELETE}
     routes          = make([]Route, 0, 0)
-    session         = struct{
-        sync.RWMutex
-        m map[string]string
-    }{m: make(map[string]string)}
+    Session         = session{m: make(map[string]string)}
 )
 
 func init() {
