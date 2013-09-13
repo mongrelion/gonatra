@@ -1,6 +1,6 @@
 package gonatra
 
-import(
+import (
     "net/http/httptest"
     "testing"
 )
@@ -33,9 +33,14 @@ func TestRenderText(t *testing.T) {
 }
 
 func TestRenderJSON(t *testing.T) {
-    expectedJSON := "{\"name\":\"apple\",\"color\":\"red\"}"
+    type Fruit struct {
+        Name  string `json:"name"`
+        Color string `json:"color"`
+    }
+    fruit        := Fruit{"apple", "red"}
+    expectedJSON := `{"name":"apple","color":"red"}`
     response     := httptest.NewRecorder()
-    RenderJSON(response, expectedJSON)
+    RenderJSON(response, fruit)
     responseBody := response.Body.String()
     // Test that the response body is a JSON representation of the object.
     if responseBody != expectedJSON {
