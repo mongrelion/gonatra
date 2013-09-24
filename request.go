@@ -6,7 +6,7 @@ import (
 
 type Request struct {
     HttpRequest *http.Request
-    Params      map[string][]string
+    Params      map[string]string
 }
 
 func buildRequest(httpReq *http.Request, route *Route) Request {
@@ -14,12 +14,12 @@ func buildRequest(httpReq *http.Request, route *Route) Request {
     return Request{httpReq, params}
 }
 
-func getParams(route *Route, request *http.Request) map[string][]string {
-    params := make(map[string][]string)
+func getParams(route *Route, request *http.Request) map[string]string {
+    params := make(map[string]string)
     // Params from query string and form.
     request.ParseForm()
     for param, values := range request.Form {
-        params[param] = values
+        params[param] = values[0]
     }
 
     // Named params, specified in the route declaration
@@ -28,7 +28,7 @@ func getParams(route *Route, request *http.Request) map[string][]string {
     for i, paramName := range pathMatches {
         if paramRegexp.MatchString(paramName) {
             param         := paramNameRegexp.FindString(paramName)
-            params[param]  = []string{urlMatches[i]}
+            params[param]  = urlMatches[i]
         }
     }
 

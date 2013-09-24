@@ -23,8 +23,8 @@ func TestBuildRequest(t *testing.T) {
         t.Errorf("expected Params to be set but got nil")
     }  else {
         // Test it sets the params properly.
-        fooParam := gonatraRequest.Params["id"][0]
-        barParam := gonatraRequest.Params["bar_id"][0]
+        fooParam := gonatraRequest.Params["id"]
+        barParam := gonatraRequest.Params["bar_id"]
         if fooParam != "123" {
             t.Errorf(`expected param "id" to be "123" but got %s`, fooParam)
         }
@@ -57,7 +57,7 @@ func TestGetParams(t *testing.T) {
             t.Errorf("expected key %s to be present in params map.", key)
         } else {
             // Test that the key holds the proper value.
-            if expectedValue != val[0] {
+            if expectedValue != val {
                 t.Errorf("expected key %s to have value %s but got %s", key, expectedValue, val)
             }
         }
