@@ -8,7 +8,7 @@ import (
 type Route struct {
     Path     string
     Verb     string
-    Callback func(response http.ResponseWriter, request *Request)
+    Callback func(response http.ResponseWriter, request *http.Request, params Params)
     Rgxp     *regexp.Regexp
 }
 
@@ -36,7 +36,7 @@ func validVerb(verb string) bool {
     return false
 }
 
-func registerRoute(verb, path string, callback func(res http.ResponseWriter, req *Request)) bool {
+func registerRoute(verb, path string, callback func(res http.ResponseWriter, req *http.Request, params Params)) bool {
     if validVerb(verb) {
         rgxp  := genRouteRegexp(path)
         route := Route{path, verb, callback, rgxp}

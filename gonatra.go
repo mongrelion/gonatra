@@ -30,25 +30,24 @@ func init() {
 
 // TODO: When calling the route's callback, instead of passing a gonatra.Request
 //       object, send the same *http.Request object and a third argument, the params.
-func dispatcher(response http.ResponseWriter, request *http.Request) {
+func dispatcher(res http.ResponseWriter, req *http.Request) {
     for _, route := range routes {
-        if matchRoute(&route, request.URL.Path) {
-            if route.Verb == request.Method {
-                request.ParseForm()
-                gonatraRequest := buildRequest(request, &route)
-                route.Callback(response, &gonatraRequest)
+        if matchRoute(&route, req.URL.Path) {
+            if route.Verb == req.Method {
+                req.ParseForm()
+                route.Callback(res, req, getParams(&route, req))
                 return
             }
         }
     }
-    http.NotFound(response, request)
+    http.NotFound(res, req)
 }
 
-func Get(path string, callback func(res http.ResponseWriter, req *Request)) bool {
+func Get(path string, callback func(http.ResponseWriter, *http.Request, Params)) bool {
     return registerRoute(HTTP_GET, path, callback)
 }
 
-func Post(path string, callback func(res http.ResponseWriter, req *Request)) bool {
+func Post(path string, callback func(http.ResponseWriter, *http.Request, Params)) bool {
     return registerRoute(HTTP_POST, path, callback)
 }
 

@@ -5,38 +5,6 @@ import (
     "testing"
 )
 
-func TestBuildRequest(t *testing.T) {
-    expectations := map[string]string{
-        "id"     : "123",
-        "bar_id" : "456",
-        "tepote" : "foo",
-        "lang"   : "en",
-    }
-    route    := Route{"/foo/:id/bar/:bar_id", HTTP_GET, nil, nil}
-    url      := "http://example.com/foo/123/bar/456?tepote=foo&lang=en"
-    req, err := http.NewRequest(HTTP_GET, url, nil)
-    if err != nil {
-        t.Errorf("Something went wrong while creating fake request to %s", url)
-    }
-    request := buildRequest(req, &route)
-    // Test it has set HttpRequest
-    if request.HttpRequest == nil {
-        t.Errorf("expected HttpRequest to be set but got nil")
-    }
-
-    // Test it has set Params.
-    if request.Params == nil {
-        t.Errorf("expected Params to be set but got nil")
-    }  else {
-        for param, expected := range expectations {
-            actual := request.Params[param]
-            if actual != expected {
-                t.Errorf(`expected param "%s" to be "%s" but got %s`, param, expected, actual)
-            }
-        }
-    }
-}
-
 func TestGetParams(t *testing.T) {
     url            := "http://example.com/users/123/articles/456/comments/789?foo=bar&lolz=katz"
     request, err   := http.NewRequest(HTTP_GET, url, nil)

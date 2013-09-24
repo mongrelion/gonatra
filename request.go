@@ -4,18 +4,10 @@ import (
     "net/http"
 )
 
-type Request struct {
-    HttpRequest *http.Request
-    Params      map[string]string
-}
+type Params map[string]string
 
-func buildRequest(httpReq *http.Request, route *Route) Request {
-    params := getParams(route, httpReq)
-    return Request{httpReq, params}
-}
-
-func getParams(route *Route, request *http.Request) map[string]string {
-    params := make(map[string]string)
+func getParams(route *Route, request *http.Request) Params {
+    params := make(Params)
     // Params from query string and form.
     request.ParseForm()
     for param, values := range request.Form {

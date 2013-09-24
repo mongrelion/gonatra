@@ -9,14 +9,14 @@ import(
 func TestDispatcher(t *testing.T) {
     rootShowed, albumsShowed, songCreated := false, false, false
     // Register some verbs:
-    Get("/", func(http.ResponseWriter, *Request) {
+    Get("/", func(http.ResponseWriter, *http.Request, Params) {
         rootShowed = true
     })
 
-    Get("/albums/:id", func(http.ResponseWriter, *Request) {
+    Get("/albums/:id", func(http.ResponseWriter, *http.Request, Params) {
         albumsShowed = true
     })
-    Post("/albums/:id/songs", func(http.ResponseWriter, *Request) {
+    Post("/albums/:id/songs", func(http.ResponseWriter, *http.Request, Params) {
         songCreated = true
     })
 
@@ -86,7 +86,7 @@ func TestDispatcher(t *testing.T) {
 
 func TestGet(t *testing.T) {
     path      := "/testget"
-    result    := Get(path, func(http.ResponseWriter, *Request) {})
+    result    := Get(path, func(http.ResponseWriter, *http.Request, Params) {})
     lastRoute := routes[len(routes) -1]
 
     // Test that the Get method returns true
@@ -107,7 +107,7 @@ func TestGet(t *testing.T) {
 
 func TestPost(t *testing.T) {
     path      := "/testpost"
-    result    := Post(path, func(http.ResponseWriter, *Request) {})
+    result    := Post(path, func(http.ResponseWriter, *http.Request, Params) {})
     lastRoute := routes[len(routes) -1]
 
     // Test that the Post method returns true

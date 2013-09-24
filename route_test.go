@@ -1,6 +1,6 @@
 package gonatra
 
-import(
+import (
     "net/http"
     "testing"
 )
@@ -43,7 +43,7 @@ func TestValidVerb(t *testing.T) {
 }
 
 func TestRegisterRoute(t *testing.T) {
-    route  := Route{"/testregisterroute", HTTP_GET, func(http.ResponseWriter, *Request) {}, nil}
+    route  := Route{"/testregisterroute", HTTP_GET, func(http.ResponseWriter, *http.Request, Params) {}, nil}
     result := registerRoute(HTTP_GET, route.Path, route.Callback)
 
     // Test that it returns true given a valid path, verb and callback.
