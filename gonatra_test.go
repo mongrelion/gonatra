@@ -7,8 +7,12 @@ import(
 )
 
 func TestDispatcher(t *testing.T) {
-    albumsShowed, songCreated := false, false
+    rootShowed, albumsShowed, songCreated := false, false, false
     // Register some verbs:
+    Get("/", func(http.ResponseWriter, *Request) {
+        rootShowed = true
+    })
+
     Get("/albums/:id", func(http.ResponseWriter, *Request) {
         albumsShowed = true
     })

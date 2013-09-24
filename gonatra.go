@@ -4,7 +4,6 @@ import (
     "net/http"
     "log"
     "regexp"
-    //"sync"
 )
 
 const (
@@ -29,6 +28,8 @@ func init() {
     http.HandleFunc("/", dispatcher)
 }
 
+// TODO: When calling the route's callback, instead of passing a gonatra.Request
+//       object, send the same *http.Request object and a third argument, the params.
 func dispatcher(response http.ResponseWriter, request *http.Request) {
     for _, route := range routes {
         if matchRoute(&route, request.URL.Path) {
