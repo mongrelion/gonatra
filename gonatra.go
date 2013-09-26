@@ -30,12 +30,10 @@ func init() {
 
 func dispatcher(res http.ResponseWriter, req *http.Request) {
     for _, route := range routes {
-        if matchRoute(&route, req.URL.Path) {
-            if route.Verb == req.Method {
-                req.ParseForm()
-                route.Callback(res, req, getParams(&route, req))
-                return
-            }
+        if route.matchesRoute(req.URL.Path) && route.matchesVerb(req) {
+            req.ParseForm()
+            route.Callback(res, req, getParams(&route, req))
+            return
         }
     }
     http.NotFound(res, req)
@@ -47,6 +45,14 @@ func Get(path string, callback func(http.ResponseWriter, *http.Request, Params))
 
 func Post(path string, callback func(http.ResponseWriter, *http.Request, Params)) bool {
     return registerRoute(HTTP_POST, path, callback)
+}
+
+func Put(path string, callback func(http.ResponseWriter, *http.Request, Params)) bool {
+    return registerRoute(HTTP_PUT, path, callback)
+}
+
+func Delete(path string, callback func(http.ResponseWriter, *http.Request, Params)) bool {
+    return registerRoute(HTTP_DELETE, path, callback)
 }
 
 func Start(port string) {

@@ -5,6 +5,36 @@ import (
     "testing"
 )
 
+func TestmatchesVerb(t *testing.T) {
+    getReq, _    := http.NewRequest("GET", "http://example.org", nil)
+    postReq, _   := http.NewRequest("POST", "http://example.org", nil)
+    putReq, _    := http.NewRequest("PUT", "http://example.org", nil)
+    deleteReq, _ := http.NewRequest("DELETE", "http://example.org", nil)
+    expectations := map[string]*http.Request{
+        "GET"    : getReq,
+        "POST"   : postReq,
+        "PUT"    : putReq,
+        "DELETE" : deleteReq,
+    }
+    for method, req := range expectations {
+        route := Route{"/", method, nil, nil}
+        if !route.matchesVerb(req) {
+            t.Errorf("expected route verb %s to match request method %s", route.Verb, req.Method)
+        }
+    }
+
+    // Method override via _method param.
+    req, err := http.NewRequest("POST", "http://example.org", nil)
+    if err != nil {
+        panic(err)
+    }
+    req.Form = map[string][]string{"_method": []string{"put"}}
+    route := Route{"/", "PUT", nil, nil}
+    if !route.matchesVerb(req) {
+        t.Errorf("expected verb PUT to match")
+    }
+}
+
 func TestGenRouteRegexp(t *testing.T) {
     rgxp := genRouteRegexp("/fruits/:id")
     if rgxp.String() != "/fruits/.+" {
@@ -12,16 +42,16 @@ func TestGenRouteRegexp(t *testing.T) {
     }
 }
 
-func TestMatchRoute(t *testing.T) {
+func TestmatchesRoute(t *testing.T) {
     carsUrl    := "/cars/123"
     fruitsUrl  := "/fruits/123"
     route      := Route{"/cars/:id", HTTP_GET, nil, nil}
     route.Rgxp = genRouteRegexp(route.Path)
 
-    if !matchRoute(&route, carsUrl) {
+    if !route.matchesRoute(carsUrl) {
         t.Errorf("expected route %s to match %s", route.Path, carsUrl)
     }
-    if matchRoute(&route, fruitsUrl) {
+    if route.matchesRoute(fruitsUrl) {
         t.Errorf("expected route %s not to match %s", route.Path, fruitsUrl)
     }
 }

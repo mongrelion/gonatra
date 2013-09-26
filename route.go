@@ -1,6 +1,7 @@
 package gonatra
 
 import (
+    "strings"
     "net/http"
     "regexp"
 )
@@ -20,8 +21,20 @@ func genRouteRegexp(route string) *regexp.Regexp {
     }
 }
 
-func matchRoute(route *Route, path string) bool {
-    return route.Rgxp.MatchString(path)
+func (r *Route) matchesRoute(path string) bool {
+    return r.Rgxp.MatchString(path)
+}
+
+func (r *Route) matchesVerb(req *http.Request) (matches bool) {
+    matches = r.Verb == req.Method;
+    if !matches && req.Method == "POST" && (r.Verb == "PUT" || r.Verb == "DELETE") {
+        req.ParseForm()
+        if method, present := req.Form["_method"]; present {
+            m := strings.ToUpper(method[0])
+            matches = r.Verb == m
+        }
+    }
+    return
 }
 
 // TODO: Instead of looping all over the array, use a function that returns
